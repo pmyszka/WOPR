@@ -1,0 +1,89 @@
+---
+- name: install openvpn
+  apt:
+    name: openvpn
+    state: present
+
+- name: create directories
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ openvpn_location }}"
+    - "{{ openvpn_location }}/keys"
+    - "{{ clientside }}/keys"
+    - "{{ clientside }}/files"
+    - "{{ serverside }}"
+
+- name: create client.conf
+  template:
+    src: templates/client.conf.j2
+    dest: "{{ clientside }}/client.conf"
+
+- name: download EasyRSA
+  get_url:
+    url: "{{ easyrsa_url }}"
+    dest: "{{ openvpn_location }}"
+
+- name: create helper scripts
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ openvpn_location }}/{{ item }}"
+    mode: 0755
+  with_items:
+    - create_serverside
+    - create_clientside
+  tags: client
+
+- name: run serverside script
+  command: ./create_serverside
+  args:
+    chdir: "{{ openvpn_location }}"
+    creates: "{{ easyrsa_server }}/ta.key"
+
+- name: run clientside script
+  command: ./create_clientside {{item}}
+  args:
+    chdir: "{{ openvpn_location }}"
+    creates: "{{ clientside }}/files/{{ item }}.ovpn"
+  with_items:
+    - "{{ openvpn_clients }}"
+  tags: client
+
+- name: install server keys
+  command: install -o root -g root -m 600 {{ item.name }} {{ openvpn_location }}/keys
+  args:
+    chdir: "{{ item.path }}"
+    creates: "{{ openvpn_location }}/keys/{{ item.name }}"
+  with_items:
+    - { name: 'ca.crt', path: "{{ easyrsa_server }}/pki" }
+    - { name: '{{ ansible_hostname }}.crt', path: "{{ easyrsa_server }}/pki/issued" }
+    - { name: '{{ ansible_hostname }}.key', path: "{{ easyrsa_server }}/pki/private" }
+    - { name: 'ta.key', path: "{{ easyrsa_server }}" }
+
+- name: copy Diffie-Hellman key
+  copy:
+    src: "{{ openvpn_dh }}"
+    dest: "{{ openvpn_location }}/keys/dh.pem"
+    owner: root
+    group: root
+    mode: 0600
+
+- name: create openvpn server.conf
+  template:
+    src: server.conf.j2
+    dest: "{{ openvpn_location }}/server.conf"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: restart openvpn in rc.local
+  lineinfile:
+    dest: /etc/rc.local
+    line: 'systemctl restart openvpn@server.service'
+    insertbefore: 'exit 0'
+
+- name: start openvpn
+  service:
+    name: openvpn@server
+    state: started

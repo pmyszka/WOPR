@@ -1,0 +1,16 @@
+[Unit]
+Description=Redsocks transparent SOCKS proxy redirector
+After=network-online.target
+
+[Service]
+RestartSec = 5
+Type=forking
+EnvironmentFile=/etc/default/redsocks
+ExecStartPre=/usr/sbin/redsocks -t -c ${CONFFILE}
+ExecStart=/usr/sbin/redsocks -c ${CONFFILE}
+ExecStartPost={{ redsocks_scripts_location }}/enable-redsocks
+Restart=on-failure
+ExecStopPost={{ redsocks_scripts_location }}/disable-redsocks
+
+[Install]
+WantedBy=multi-user.target

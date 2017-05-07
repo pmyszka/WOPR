@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -x
+if [[ $UID != 0 ]]; then
+    echo "This must be run as root."
+    exit 1
+fi
+
+{{ netns_scripts_location }}/netns-create {{ transmission_netns }} {{ transmission_veth }} {{ transmission_vpeer }} {{ transmission_netns_space }} {{ transmission_veth_ip }} {{ transmission_vpeer_ip }}
+# uk proxy
+/sbin/iptables -t nat -I PREROUTING 1 -i {{ transmission_veth }} -p tcp -j DNAT --to-destination {{ redsocks_ip }}:{{ redsocks_proxy_uk_local }}

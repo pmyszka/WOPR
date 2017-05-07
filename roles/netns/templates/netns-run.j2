@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -x
+if [[ $UID != 0 ]]; then
+    echo "This must be run as root."
+    exit 1
+fi
+
+NS=$1
+shift
+exec ip netns exec $NS "$@"

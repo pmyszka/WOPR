@@ -1,0 +1,33 @@
+---
+- name: install apt packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - iproute2
+    - iptables
+    - ifupdown
+
+- name: create {{ netns_scripts_location }}/netns-create
+  template:
+    src: netns-create.j2
+    dest: "{{ netns_scripts_location }}/netns-create"
+    mode: 0755
+
+- name: create {{ netns_scripts_location }}/netns-delete
+  template:
+    src: netns-delete.j2
+    dest: "{{ netns_scripts_location }}/netns-delete"
+    mode: 0755
+
+- name: create {{ netns_scripts_location }}/netns-run
+  template:
+    src: netns-run.j2
+    dest: "{{ netns_scripts_location }}/netns-run"
+    mode: 0755
+
+- name: create {{ netns_scripts_location }}/netns-wipe
+  template:
+    src: netns-wipe.j2
+    dest: "{{ netns_scripts_location }}/netns-wipe"
+    mode: 0755

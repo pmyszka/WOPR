@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -x
+if [[ $UID != 0 ]]; then
+    echo "This must be run as root."
+    exit 1
+fi
+
+/sbin/sysctl -q net.ipv4.ip_forward=1
+
+/sbin/iptables -t nat -N REDSOCKS
+/sbin/iptables -t nat -A REDSOCKS -d 0.0.0.0/8 -j RETURN
+/sbin/iptables -t nat -A REDSOCKS -d 10.0.0.0/8 -j RETURN
+/sbin/iptables -t nat -A REDSOCKS -d 127.0.0.0/8 -j RETURN
+/sbin/iptables -t nat -A REDSOCKS -d 169.254.0.0/16 -j RETURN
+/sbin/iptables -t nat -A REDSOCKS -d 172.16.0.0/12 -j RETURN
+/sbin/iptables -t nat -A REDSOCKS -d 192.168.0.0/16 -j RETURN
+/sbin/iptables -t nat -A REDSOCKS -d 224.0.0.0/4 -j RETURN
+/sbin/iptables -t nat -A REDSOCKS -d 240.0.0.0/4 -j RETURN
+
+# we dont want to route openvpn traffic through proxy, do we?
+/sbin/iptables -t nat -A REDSOCKS -s 10.8.0.0/16 -j RETURN
+
+/sbin/iptables -t nat -A PREROUTING -p tcp -j REDSOCKS
+
+{{ redsocks_scripts_location }}/redsocks-proxy-uk

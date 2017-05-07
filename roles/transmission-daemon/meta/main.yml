@@ -1,0 +1,5 @@
+---
+dependencies:
+  - { role: netns }
+  - { role: redsocks }
+  - { role: apache2 }

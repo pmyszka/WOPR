@@ -1,0 +1,7 @@
+---
+- name: configure WOPR
+  hosts: wopr
+  environment:
+    PATH: /bin:/sbin:/usr/bin:/usr/sbin
+  roles:
+    - wopr

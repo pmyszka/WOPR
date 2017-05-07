@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -x
+if [[ $UID != 0 ]]; then
+    echo "This must be run as root."
+    exit 1
+fi
+
+/sbin/iptables -t nat -A REDSOCKS -p tcp -j REDIRECT --to-ports {{ redsocks_proxy_us_local }}

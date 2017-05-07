@@ -1,0 +1,16 @@
+# Place in /lib/systemd/system/
+
+[Unit]
+Description=Transmission BitTorrent Daemon
+After=netns-manager.service
+
+[Service]
+User=root
+Type=simple
+ExecStartPre={{ transmission_scripts_location }}/netns-enable-transmission
+ExecStart={{ transmission_scripts_location }}/netns-run {{ transmission_netns }} su -s /bin/bash debian-transmission -c '/usr/bin/transmission-daemon -f --log-error'
+ExecReload=/bin/kill -s HUP $MAINPID
+ExecStopPost={{ transmission_scripts_location }}/netns-disable-transmission
+
+[Install]
+WantedBy=multi-user.target

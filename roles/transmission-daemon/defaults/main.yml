@@ -1,0 +1,10 @@
+---
+transmission_scripts_location: /usr/local/bin
+transmission_downloads_dir: /media/storage/downloads
+
+transmission_netns: transmission
+transmission_netns_space: 10.200.1.0
+transmission_veth: veth1
+transmission_veth_ip: 10.200.1.1
+transmission_vpeer: vpeer1
+transmission_vpeer_ip: 10.200.1.2

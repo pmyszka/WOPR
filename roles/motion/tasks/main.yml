@@ -1,0 +1,35 @@
+---
+- name: install motion
+  apt:
+    name: motion
+    state: present
+
+- name: enable motion.service
+  service:
+    name: motion
+    enabled: yes
+    daemon_reload: yes
+
+- name: create /etc/motion/motion.conf
+  template:
+    src: motion.conf.j2
+    dest: /etc/motion/motion.conf
+
+- name: configure /etc/default/motion
+  lineinfile:
+    dest: /etc/default/motion
+    regexp: ^start_motion_daemon=
+    line: start_motion_daemon=yes
+
+- name: create {{ motion_storage_dir }}
+  file:
+    path: "{{ motion_storage_dir }}"
+    owner: motion
+    group: osmc
+    mode: 0775
+
+- name: restart motion
+  service:
+    name: motion
+    state: restarted
+    daemon_reload: yes

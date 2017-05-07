@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -x
+if [[ $UID != 0 ]]; then
+    echo "This must be run as root."
+    exit 1
+fi
+
+NS=$1
+VETH=$2
+NS_SPACE=$3
+
+/sbin/iptables -D INPUT \! -i ${VETH} -s ${NS_SPACE}/24 -j DROP
+/sbin/iptables -t nat -D POSTROUTING -s ${NS_SPACE}/24 -o eth0 -j MASQUERADE
+
+/sbin/iptables -D FORWARD -i eth0 -o ${VETH} -j ACCEPT
+/sbin/iptables -D FORWARD -o eth0 -i ${VETH} -j ACCEPT
+
+ip netns delete $NS
+rm -rf /etc/netns/$NS

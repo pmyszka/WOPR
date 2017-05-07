@@ -1,0 +1,70 @@
+---
+- name: install transmission-daemon
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - transmission-daemon
+    - telnet
+
+- name: install stig
+  pip:
+    name: stig
+    executable: /usr/local/bin/pip3
+
+- name: configure /etc/apache2/ports.conf
+  lineinfile:
+    dest: /etc/apache2/ports.conf
+    regexp: ^Listen 9091
+    line: Listen 9091
+
+- name: create /etc/apache2/sites-enabled/001-transmission.conf
+  template:
+    src: 001-transmission-daemon.conf.j2
+    dest: /etc/apache2/sites-enabled/001-transmission-daemon.conf
+
+- name: add transmission-daemon.service
+  template:
+    src: transmission-daemon.service.j2
+    dest: /etc/systemd/system/transmission-daemon.service
+
+- name: create /usr/local/bin/netns-enable-transmission
+  template:
+    src: netns-enable-transmission.j2
+    dest: "{{ transmission_scripts_location }}/netns-enable-transmission"
+    mode: 0755
+
+- name: create /usr/local/bin/netns-disable-transmission
+  template:
+    src: netns-disable-transmission.j2
+    dest:  "{{ transmission_scripts_location }}/netns-disable-transmission"
+    mode: 0755
+
+- name: enable transmission-daemon.service
+  service:
+    name: transmission-daemon
+    enabled: yes
+    daemon_reload: yes
+
+- name: stop transmission-daemon.service
+  service:
+    name: transmission-daemon
+    state: stopped
+    daemon_reload: yes
+
+- name: create /etc/transmission-daemon/settings.json
+  template:
+    src: settings.json.j2
+    dest: /etc/transmission-daemon/settings.json
+
+- name: restart transmission-daemon.service
+  service:
+    name: transmission-daemon
+    state: restarted
+    daemon_reload: yes
+
+- name: restart apache2.service
+  service:
+    name: apache2
+    state: restarted
+    daemon_reload: yes

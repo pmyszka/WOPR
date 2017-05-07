@@ -1,0 +1,84 @@
+homeassistant:
+  name: Home
+  latitude: {{ hass_latitude_home }}
+  longitude: {{ hass_longitude_home }}
+  elevation: {{ hass_elevation }}
+  unit_system: metric
+  time_zone: Europe/London
+  customize: !include customize.yaml
+
+zone:
+  name: Home
+  latitude: {{ hass_latitude_home }}
+  longitude: {{ hass_longitude_home }}
+  radius: 200
+  icon: mdi:home
+
+zone work_a:
+  name: Work
+  latitude: {{ hass_latitude_work_a }}
+  longitude: {{ hass_longitude_work_a }}
+  radius: 500
+  icon: mdi:briefcase
+
+zone work_b:
+  name: Work
+  latitude: {{ hass_latitude_work_b }}
+  longitude: {{ hass_longitude_work_b }}
+  radius: 500
+  icon: mdi:briefcase
+
+frontend:
+
+http:
+
+recorder:
+  purge_days: 7
+
+#discovery:
+updater:
+
+history:
+
+logbook:
+logger:
+  default: info
+
+sun:
+
+emulated_hue:
+  expose_by_default: false
+
+media_player kodi:
+  platform: kodi
+  host: http://{{ hass_kodi_host }}
+
+media_player tv:
+  platform: webostv
+  host: {{ hass_tv_host }}
+  name: Stevie
+
+camera living_room:
+  platform: mjpeg
+  mjpeg_url: {{ hass_camera_url }}
+  name: Living room
+
+switch lamp:
+  platform: tplink
+  host: {{ hass_lamp_host }}
+  name: Lamp
+
+switch:
+  platform: command_line
+  switches:
+    motion_record:
+      command_on: 'systemctl start motion'
+      command_off: 'systemctl stop motion'
+      command_state: 'systemctl status motion | grep "Active: active"'
+      friendly_name: Living room camera
+    tv:
+      command_on: "kodi-send --action=CECActivateSource"
+      command_off: ""
+      command_state: ""
+      friendly_name: Stevie
+

@@ -1,0 +1,16 @@
+---
+- name: install apache2
+  apt:
+    name: apache2
+    state: present
+
+- name: install proxy_http
+  apache2_module:
+    state: present
+    name: proxy_http
+
+- name: enable apache2.service
+  service:
+    name: apache2
+    enabled: yes
+    daemon_reload: yes

@@ -1,0 +1,5 @@
+---
+dependencies:
+  - { role: homeassistant }
+  - { role: transmission-daemon }
+  - { role: openvpn }

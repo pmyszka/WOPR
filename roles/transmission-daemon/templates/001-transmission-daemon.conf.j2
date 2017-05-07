@@ -1,0 +1,8 @@
+<VirtualHost *:9091>
+        ServerAdmin webmaster@localhost
+
+        ProxyPass / http://{{ transmission_vpeer_ip }}:9091/
+        ProxyPassReverse / http://{{ transmission_vpeer_ip }}:9091/
+        ErrorLog ${APACHE_LOG_DIR}/error.log
+        CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>

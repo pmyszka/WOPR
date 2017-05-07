@@ -1,0 +1,57 @@
+---
+- name: install redsocks
+  apt:
+    name: redsocks
+    state: present
+
+- name: create redsocks.conf
+  template:
+    src: redsocks.conf.j2
+    dest: /etc/redsocks.conf
+
+- name: create {{ redsocks_scripts_location }}/enable-redsocks
+  template:
+    src: enable-redsocks.j2
+    dest: "{{ redsocks_scripts_location }}/enable-redsocks"
+    mode: 0755
+
+- name: create {{ redsocks_scripts_location }}/disable-redsocks
+  template:
+    src: disable-redsocks.j2
+    dest: "{{ redsocks_scripts_location }}/disable-redsocks"
+    mode: 0755
+
+- name: create {{ redsocks_scripts_location }}/redsocks-proxy-pl
+  template:
+    src: redsocks-proxy-pl.j2
+    dest: "{{ redsocks_scripts_location }}/redsocks-proxy-pl"
+    mode: 0755
+
+- name: create {{ redsocks_scripts_location }}/redsocks-proxy-uk
+  template:
+    src: redsocks-proxy-uk.j2
+    dest: "{{ redsocks_scripts_location }}/redsocks-proxy-uk"
+    mode: 0755
+
+- name: create {{ redsocks_scripts_location }}/redsocks-proxy-us
+  template:
+    src: redsocks-proxy-us.j2
+    dest: "{{ redsocks_scripts_location }}/redsocks-proxy-us"
+    mode: 0755
+
+- name: create redsocks.service
+  template:
+    src: redsocks.service.j2
+    dest: /etc/systemd/system/redsocks.service
+
+- name: enable redsocks.service
+  service:
+    name: redsocks
+    enabled: yes
+    daemon_reload: yes
+
+- name: restart redsocks.service
+  service:
+    name: redsocks
+    state: restarted
+    daemon_reload: yes
