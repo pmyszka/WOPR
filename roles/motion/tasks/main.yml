@@ -25,7 +25,7 @@
   file:
     path: "{{ motion_storage_dir }}"
     owner: motion
-    group: osmc
+    group: staff
     mode: 0775
 
 - name: restart motion
