@@ -1,0 +1,6 @@
+---
+sshd: sshd
+sshd_config: /etc/ssh/sshd_config
+
+allowed_networks:
+  - 0.0.0.0/32
