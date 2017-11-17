@@ -7,11 +7,6 @@
     - transmission-daemon
     - telnet
 
-- name: install stig
-  pip:
-    name: stig
-    executable: /usr/local/bin/pip3
-
 - name: configure /etc/apache2/ports.conf
   lineinfile:
     dest: /etc/apache2/ports.conf
