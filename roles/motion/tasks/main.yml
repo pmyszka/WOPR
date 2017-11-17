@@ -28,6 +28,14 @@
     group: staff
     mode: 0775
 
+- name: add cron job that clears the directory after 2 weeks
+  cron:
+    name: "clear motion directory"
+    minute: "0"
+    hour: "0"
+    user: root
+    job: 'find {{ motion_storage_dir }}/* -mtime +14 -exec rm {} \;'
+
 - name: restart motion
   service:
     name: motion
