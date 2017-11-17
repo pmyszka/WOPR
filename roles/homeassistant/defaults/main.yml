@@ -1,2 +1,3 @@
 ---
+hass_config_repo: https://github.com/pmyszka/homeassistant-config.git
 hass_config_dir: /etc/homeassistant/config

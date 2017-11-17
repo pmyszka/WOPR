@@ -1,2 +1,6 @@
 [wopr]
 wopr.local
+
+[wopr:vars]
+ansible_connection=ssh
+ansible_become=true
